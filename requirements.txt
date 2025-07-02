@@ -1,7 +1,9 @@
 pandas
 numpy
 matplotlib
+seaborn
 requests
 python-dotenv
 tqdm
 pytest
+jupyter
