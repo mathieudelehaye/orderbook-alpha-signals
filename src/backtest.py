@@ -106,6 +106,76 @@ def calculate_metrics(equity_curve: pd.Series, strategy_returns: pd.Series,
     
     return metrics
 
+def backtest_limited_trades(df: pd.DataFrame, signal: pd.Series, cost_bp: float = 0.0, 
+                           max_trades_per_day: int = 10, signal_threshold: float = 0.3) -> Tuple[pd.Series, pd.Series]:
+    """
+    Enhanced backtest with trade frequency limits and signal filtering.
+    
+    Args:
+        df: DataFrame with OHLCV data, must contain 'close' column
+        signal: Trading signal series (1 = long, -1 = short, 0 = neutral)
+        cost_bp: Trading cost in basis points (e.g., 1.0 = 1bp = 0.01%)
+        max_trades_per_day: Maximum number of trades allowed per day
+        signal_threshold: Only trade when |signal| > threshold (filters weak signals)
+    
+    Returns:
+        Tuple of (equity_curve, strategy_returns)
+    """
+    # Calculate returns
+    returns = df['close'].pct_change().fillna(0.0)
+    
+    # Filter signals by threshold - only trade on strong signals
+    filtered_signal = signal.copy()
+    filtered_signal[abs(signal) < signal_threshold] = 0.0
+    
+    # Create position series with trade limits
+    position = pd.Series(0.0, index=filtered_signal.index)
+    current_position = 0.0
+    
+    # Track trades per day
+    daily_trades = {}
+    
+    for i, (timestamp, sig) in enumerate(filtered_signal.items()):
+        if i == 0:
+            continue
+            
+        # Get the date for trade limiting
+        current_date = timestamp.date()
+        
+        # Initialize daily trade counter
+        if current_date not in daily_trades:
+            daily_trades[current_date] = 0
+        
+        # Determine desired position
+        desired_position = sig
+        
+        # Check if we need to change position
+        if desired_position != current_position:
+            # Check if we can make another trade today
+            if daily_trades[current_date] < max_trades_per_day:
+                current_position = desired_position
+                daily_trades[current_date] += 1
+        
+        position.iloc[i] = current_position
+    
+    # Apply 1-period lag (realistic trading assumption)
+    position = position.shift(1).fillna(0.0)
+    
+    # Strategy returns before costs
+    strategy_returns = returns * position
+    
+    # Apply trading costs
+    if cost_bp > 0:
+        # Calculate position changes (trades)
+        trades = position.diff().abs().fillna(0.0)
+        transaction_costs = trades * cost_bp * 1e-4  # Convert bp to decimal
+        strategy_returns -= transaction_costs
+    
+    # Calculate equity curve
+    equity_curve = (1 + strategy_returns).cumprod()
+    
+    return equity_curve, strategy_returns
+
 def backtest(df: pd.DataFrame, signal: pd.Series, cost_bp: float = 0.0) -> Tuple[pd.Series, pd.Series]:
     """
     Legacy function name for backwards compatibility.
