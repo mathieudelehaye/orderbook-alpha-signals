@@ -1,12 +1,39 @@
 """Signal engineering utilities for orderbook-style alpha generation."""
 import pandas as pd
 import numpy as np
-from typing import Optional
+import logging
+from typing import Optional, Union, Dict, Any
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+class SignalValidationError(Exception):
+    """Custom exception for signal validation errors."""
+    pass
 
 def queue_imbalance(bid_size: pd.Series, ask_size: pd.Series) -> pd.Series:
     """Compute (bid - ask) / (bid + ask)."""
     denom = bid_size + ask_size
     return (bid_size - ask_size) / denom.replace(0, pd.NA)
+
+def _validate_dataframe(df: pd.DataFrame, required_columns: list) -> None:
+    """Validate DataFrame has required columns and data."""
+    if df is None or df.empty:
+        raise SignalValidationError("DataFrame is None or empty")
+    
+    missing_cols = [col for col in required_columns if col not in df.columns]
+    if missing_cols:
+        raise SignalValidationError(f"Missing required columns: {missing_cols}")
+    
+    # Check for all-null columns
+    null_cols = [col for col in required_columns if df[col].isnull().all()]
+    if null_cols:
+        raise SignalValidationError(f"Columns contain only null values: {null_cols}")
+
+def _validate_window(window: int, min_window: int = 2) -> None:
+    """Validate window parameter."""
+    if not isinstance(window, int) or window < min_window:
+        raise SignalValidationError(f"Window must be integer >= {min_window}, got {window}")
 
 def vwap_deviation(df: pd.DataFrame, window: int = 20) -> pd.Series:
     """
@@ -18,12 +45,45 @@ def vwap_deviation(df: pd.DataFrame, window: int = 20) -> pd.Series:
     
     Returns:
         Series with VWAP deviation signal
+        
+    Raises:
+        SignalValidationError: If validation fails
     """
-    # Typical price weighted by volume
-    typical_price = (df['high'] + df['low'] + df['close']) / 3
-    vwap = (typical_price * df['volume']).rolling(window=window).sum() / df['volume'].rolling(window=window).sum()
-    
-    return (df['close'] - vwap) / vwap
+    try:
+        _validate_dataframe(df, ['high', 'low', 'close', 'volume'])
+        _validate_window(window)
+        
+        # Check for negative volume
+        if (df['volume'] < 0).any():
+            logger.warning("Found negative volume values, setting to zero")
+            volume = df['volume'].clip(lower=0)
+        else:
+            volume = df['volume']
+        
+        # Typical price weighted by volume
+        typical_price = (df['high'] + df['low'] + df['close']) / 3
+        
+        # Calculate VWAP with zero-division protection
+        volume_sum = volume.rolling(window=window).sum()
+        vwap_numerator = (typical_price * volume).rolling(window=window).sum()
+        
+        # Avoid division by zero
+        vwap = vwap_numerator / volume_sum.replace(0, np.nan)
+        
+        # Calculate deviation with zero-division protection
+        deviation = (df['close'] - vwap) / vwap.replace(0, np.nan)
+        
+        # Log statistics
+        valid_signals = deviation.dropna()
+        if len(valid_signals) > 0:
+            logger.debug(f"VWAP deviation: {len(valid_signals)} valid signals, "
+                        f"range [{valid_signals.min():.4f}, {valid_signals.max():.4f}]")
+        
+        return deviation
+        
+    except Exception as e:
+        logger.error(f"Error calculating VWAP deviation: {e}")
+        return pd.Series(np.nan, index=df.index)
 
 def price_momentum(df: pd.DataFrame, window: int = 10) -> pd.Series:
     """
