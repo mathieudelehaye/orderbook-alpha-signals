@@ -224,7 +224,7 @@ class RiskManager:
                 return 0.0
 
             if method == "historical":
-                return returns.quantile(1 - confidence_level)
+                return float(returns.quantile(1 - confidence_level))
 
             if method == "parametric":
                 from scipy import stats
@@ -232,7 +232,7 @@ class RiskManager:
                 mean_return = returns.mean()
                 std_return = returns.std()
                 z_score = stats.norm.ppf(1 - confidence_level)
-                return mean_return + z_score * std_return
+                return float(mean_return + z_score * std_return)
 
             raise ValueError("Unknown VaR method: %s" % method)
 
@@ -246,7 +246,7 @@ class RiskManager:
         """Calculate Expected Shortfall (Conditional VaR)."""
         try:
             var = self.calculate_var(returns, confidence_level)
-            return returns[returns <= var].mean()
+            return float(returns[returns <= var].mean())
         except Exception as e:
             logger.error("Error calculating Expected Shortfall: %s" % e)
             return 0.0
