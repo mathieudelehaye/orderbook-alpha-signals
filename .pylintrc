@@ -1,0 +1,46 @@
+[MASTER]
+ignore=migrations,.venv,__pycache__,.git
+ignore-paths=^.*site-packages/sympy/polys/numberfields/resolvent_lookup\.py$
+load-plugins=
+
+[MESSAGES CONTROL]
+disable=
+    C0114,  # Missing module docstring
+    C0115,  # Missing class docstring
+    C0116,  # Missing function or method docstring
+    W0613,  # Unused argument (common in Flask route handlers)
+    R0801,  # Similar lines in the same file
+    R0903,  # Too few public methods (common for lightweight service/model classes)
+    W0511,  # TODO comment (common for TODOs in code)
+    C0412,  # Ungrouped imports (langchain_openai is separate from langchain)
+    astroid-error,  # Disable astroid errors (like recursion issues with complex libraries)
+    W0718,   # Catching too general exception Exception
+    R0914,   # Too many local variables
+    R0915,   # Too many statements
+    R0911,   # Too many return statements
+    R1702,  # Too many nested blocks
+    R0912,  # Too many branches
+    E402,   # Module level import not at top of file
+    W1203,  # Use lazy % formatting in logging functions
+    W1201,  # Use lazy % formatting in logging functions  
+    C0209,  # Formatting a regular string which could be an f-string
+    W0707,  # Consider explicitly re-raising using 'raise ... from e'
+    W0715,  # Exception arguments suggest string formatting might be intended
+    R0902,  # Too many instance attributes
+    R0913,  # Too many arguments
+    R0917,  # Too many positional arguments
+    C0415,  # Import outside toplevel
+    E0401,  # Unable to import
+
+[TYPECHECK]
+generated-members=
+
+[CLASSES]
+defining-attr-methods=
+    __init__,
+    setUp,
+    setup_method
+
+[DESIGN]
+max-args=6
+max-positional-arguments=6

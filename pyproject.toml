@@ -137,3 +137,16 @@ exclude_lines = [
     "if 0:",
     "if __name__ == .__main__.:"
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E501", "E203", "E402"]
+
+[tool.ruff.lint.per-file-ignores]
+"notebooks/*.ipynb" = ["E402", "F401", "F841"]
+"tests/*" = ["S101", "PLR2004"]
