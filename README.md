@@ -6,8 +6,26 @@
 
 **Enterprise-grade quantitative trading research toolkit** for engineering orderbook-style signals and backtesting intraday alpha strategies. This repository contains **no raw market data** — users fetch data with their own API credentials.
 
-![Professional Risk Management](docs/images/professional_risk_management.png)
+![Professional Risk Management](docs/images/Screenshot04.png)
 *Enterprise-grade risk management with automated stop-loss, dynamic position sizing, and institutional-quality risk controls*
+
+## 📷 Technical Analysis Screenshots
+
+### Market Data Visualization
+![Market Data](docs/images/Screenshot01.png)
+*Professional AAPL 1-minute price and volume data with market hours highlighting and timezone-aware analysis*
+
+### Signal Engineering Dashboard
+![Signal Engineering](docs/images/Screenshot02.png)
+*Comprehensive 5-panel signal analysis showing VWAP deviation, mean reversion, momentum, RSI, and volume surge indicators*
+
+### Signal Correlation Analysis
+![Signal Correlations](docs/images/Screenshot03.png)
+*Professional correlation matrix revealing signal relationships and diversification opportunities*
+
+### Transaction Cost Sensitivity Analysis
+![Cost Sensitivity](docs/images/Screenshot05.png)
+*Strategy robustness testing across transaction cost scenarios demonstrating production-ready risk assessment*
 
 ## 🚀 Key Features
 
@@ -247,28 +265,6 @@ Our GitHub Actions pipeline includes:
 - ✅ **Docker Build & Test**
 - ✅ **Documentation Generation**
 - ✅ **Automated Deployment**
-
-## 📷 Technical Analysis Screenshots
-
-### Market Data Visualization
-![Market Data](docs/images/market_data_visualization.png)
-*Professional AAPL 1-minute price and volume data with market hours highlighting and timezone-aware analysis*
-
-### Signal Engineering Dashboard
-![Signal Engineering](docs/images/signal_engineering_dashboard.png)
-*Comprehensive 5-panel signal analysis showing VWAP deviation, mean reversion, momentum, RSI, and volume surge indicators*
-
-### Signal Correlation Analysis
-![Signal Correlations](docs/images/signal_correlation_matrix.png)
-*Professional correlation matrix revealing signal relationships and diversification opportunities*
-
-### Professional Risk Management
-![Risk Management](docs/images/professional_risk_management.png)
-*Enterprise-grade risk management featuring automated stop-loss, dynamic position sizing, risk metrics dashboard, and drawdown protection with institutional-quality controls*
-
-### Transaction Cost Sensitivity Analysis
-![Cost Sensitivity](docs/images/transaction_cost_sensitivity.png)
-*Strategy robustness testing across transaction cost scenarios demonstrating production-ready risk assessment*
 
 ## 🏗️ Recent Enhancements
 
