@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
     - uses: actions/checkout@v4
@@ -66,7 +66,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
@@ -107,7 +107,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: "3.10"
 
     - name: Install security tools
       run: |
@@ -120,7 +120,7 @@ jobs:
       run: safety check --json --output safety-report.json || true
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -136,7 +136,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
@@ -180,7 +180,7 @@ jobs:
         pytest test_performance.py --benchmark-only --benchmark-json=benchmark.json
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
         path: benchmark.json
@@ -194,7 +194,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: "3.10"
 
     - name: Install documentation tools
       run: |
@@ -206,7 +206,7 @@ jobs:
         pdoc --html --output-dir docs src/
         
     - name: Upload documentation
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: documentation
         path: docs/
@@ -232,7 +232,8 @@ jobs:
 
         COPY . .
 
-        RUN pytest tests/ -v
+        ENV PYTHONPATH=/app
+        RUN python -m pytest tests/ -v
 
         CMD ["python", "-m", "src.signals"]
         EOF
@@ -243,7 +244,7 @@ jobs:
 
     - name: Test Docker image
       run: |
-        docker run --rm orderbook-alpha-signals:${{ github.sha }} python -c "import src.signals; print('Docker build successful')"
+        docker run --rm -e PYTHONPATH=/app orderbook-alpha-signals:${{ github.sha }} python -c "import src.signals; print('Docker build successful')"
 
   deploy-staging:
     if: github.ref == 'refs/heads/develop'
