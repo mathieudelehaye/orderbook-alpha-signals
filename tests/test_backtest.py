@@ -1,6 +1,12 @@
+import sys
+from pathlib import Path
+
 import pandas as pd
 
-from src.backtest import backtest
+# Add src to Python path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from backtest import backtest
 
 
 def test_backtest_len():
