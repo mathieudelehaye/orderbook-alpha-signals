@@ -7,3 +7,9 @@ python-dotenv
 tqdm
 pytest
 jupyter
+pandoc
+nbconvert[webpdf]
+pylint
+black
+ruff
+isort
