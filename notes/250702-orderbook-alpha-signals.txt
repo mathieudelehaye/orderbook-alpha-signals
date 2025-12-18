@@ -1,0 +1,242 @@
+
+
+
+
+
+
+$env:POLY_API_KEY = "Ab7w63S7k9zGhtpS7pFbO24a0HF81Vot"; python -c "import os; print('Direct env var test:', bool(os.getenv('POLY_API_KEY')))"
+
+
+
+
+
+npm install -g npm@11.4.2
+
+npm update
+npm install
+
+
+
+npm init -y
+
+
+Remove-Item -Path "your\directory\path" -Recurse -Force
+
+
+
+Your notebook performs a comprehensive alpha signal backtesting workflow for
+  orderbook-based trading strategies:
+
+Main functions:
+1. Data loading - Loads 1-minute AAPL OHLCV data (1,585 rows from Feb 5-7, 2025)
+2. Signal engineering - Creates 5 alpha signals: VWAP deviation, mean reversion,
+momentum, RSI, volume surge
+3. Individual backtesting - Tests each signal separately with transaction costs
+4. Combined strategy - Weights signals by Sharpe ratios and combines them
+5. Risk analysis - Analyzes drawdowns, returns distribution, rolling metrics
+6. Cost sensitivity - Tests performance across different transaction cost levels
+7. Performance summary - Compares all strategies and provides insights
+
+Current results show:
+- Dataset: 1,585 minute bars from real AAPL data
+- Combined strategy achieved better risk-adjusted returns than individual
+signals
+- Transaction cost analysis helps determine strategy viability
+- Comprehensive performance metrics and visualizations
+
+The notebook is fully functional and demonstrates a professional quant analysis
+workflow.
+
+
+
+
+
+# pdf cver 
+python -m playwright install chromium
+
+
+
+# venv 
+# lst w pkg to nstl
+python -m pip install --upgrade pip
+
+# cat requirements.txt 
+pip install -r requirements.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Fl > Rlo doc from fl > F1 > F7  
+
+# PS
+cd C:\Users\mathi\source\repos\fin\qmul-msc-dissertation\report
+
+$filename="mdelehaye-report"; pdflatex -synctex=1 -interaction=nonstopmode   "$filename.tex"; bibtex "$filename"; pdflatex -synctex=1 -interaction=nonstopmode    "$filename.tex"; pdflatex -synctex=1 -interaction=nonstopmode "$filename.tex"
+
+# latex linter
+Slc pgah > ALT+Q
+
+# Git:
+cd ~/source/repos/fin/qmul-msc-dissertation
+
+# WSL 
+cd /mnt/c/Users/mathi/source/repos/fin/qmul-msc-dissertation
+
+env="/mnt/c/Users/mathi/source/repos/fin/qmul-msc-dissertation/.venv"
+uv venv $env --python python3.11 --allow-existing # avoi ask 2 rpac xist .venv eah tme
+source "$env/bin/activate"
+python --version && which python
+
+cat requirements.txt
+uv pip install -r scripts/requirements.txt
+
+jupyter lab
+
+python -m scripts.fetch_hl_hourly `
+  --mode local `
+  --base ~/hl/data `
+  --date 2025-09-15 `
+  --hour 13 `
+  --out node_order_statuses_2025-09-15_13.jsonl
+
+python -m scripts.read_par.inspect_par
+
+python -m scripts.find_min_latency
+
+# count gen'd fl #7
+find /home/mdelehaye/hl_data/dser_dat/04-intermediate/250616-250622/subset/01-tkr_cpet_congestion_efx -maxdepth 1 -type f -name '*.csv' | wc -l
+
+grep -o "Alo,limit" /mnt/c/Users/mathi/Downloads/tmp02.txt | wc -l
+grep -o "False,resting" /mnt/c/Users/mathi/Downloads/tmp02.txt | wc -l
+grep -o "Gtc,limit" /mnt/c/Users/mathi/Downloads/tmp02.txt | wc -l
+grep -o "Ioc,limit" /mnt/c/Users/mathi/Downloads/tmp02.txt | wc -l
+
+python -m scripts.measure_latency.extract_failed_ioc_orders 
+# e.g. "2025-07-09 23:56:43.570092","0xc679fc1d13342569544950cdfc77f172ac3092f6","False","111292","0.00031",657290000
+python read_par/find_block.py # 657291454, 657291453, 657291452, 657291451, 657291450 ...
+python read_par/read_block_lob.py # sl lim prc: 111292 (.00031 BTC) => 657291450: bst ask = 111292 (44.03365000 BTC) bst bid = 111290 (0.64831000 BTC), 657291451: bst ask = 111291 (7.39127000 BTC) bst bid = 111290 (0.64831000 BTC) => hi sl psr, mp went dn => IoC fail.
+
+
+deactivate
+
+# ncps arv
+gzip -dc /home/mdelehaye/hl_data/btc_trades/20250616/btc_trades_20250616_3.csv.gz > btc_trades_20250616_3.csv
+
+# o, cncl, l4 ob 
+cd /mnt/c/Users/mathi/source/repos/fin/qmul-msc-dissertation/
+
+# .par LOB snho 
+rm -rf .venv/
+
+# psn .csv fl as .db sqlite3 DB:
+cd /home/mdelehaye/hl_data/reconstructed_data/tmp
+rm data.db
+sqlite3 "data.db"
+.mode csv
+.import 656330000_orders.csv orders
+.import 656330000_cancels.csv cancels
+.import 656330000_blocks_details.csv blocks_details
+.import 656330000_real_topaskbid.csv real_topaskbid
+.tables -- `cancels  orders
+.schema
+.headers on
+SELECT * FROM orders LIMIT 5;
+SELECT * FROM orders WHERE failed = "False" LIMIT 5;
+
+SELECT * FROM cancels LIMIT 5;
+
+SELECT * FROM blocks_details LIMIT 5;
+
+SELECT * FROM real_topaskbid LIMIT 5;
+
+
+
+
+
+
+
+
+cd C:\Users\mathi\source\repos\py\orderbook-alpha-signals
+
+$env:VENV_DIR = ".venv\"
+py -3.11 -m venv $env:VENV_DIR
+& "$env:VENV_DIR\Scripts\Activate.ps1"
+python --version; (Get-Command python).Source
+
+python -m pip install --upgrade pip
+
+pip install -r .\requirements.txt --upgrade
+
+# xpor nte-bok 2 pdf
+jupyter nbconvert --to webpdf notebooks/01_signal_backtest.ipynb --allow-chromium-download
+jupyter nbconvert --to webpdf notebooks/02_risk_managed_backtest.ipynb --allow-chromium-download
+
+$env:BROWSER = '"C:\Program Files\Google\Chrome\Application\chrome.exe" %s'
+jupyter lab
+
+# linter
+.\fix_lint.ps1
+
+
+deactivate
+
+# npm 
+npm install -g @anthropic-ai/claude-code
+# `-g` 4 glo nstl: in `C:\Users\mathi\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code`
+claude
+
+
+
+
+
+
+
+
+
+python -c "from dotenv import load_dotenv; import os; print('Loaded:', load_dotenv(verbose=True)); print('Key:', os.getenv('POLY_API_KEY'))"
+
+
+
+
+
+
+
+
+
+# wrk:
+
+
+# Git:
+cd /c/Users/mathi/source/repos/fin/orderbook-alpha-signals
+
+# WSL 
+cd /mnt/c/Users/mathi/source/repos/fin/orderbook-alpha-signals
+
+env="/mnt/c/Users/mathi/source/repos/fin/orderbook-alpha-signals/.venv"
+uv venv $env --python python3.11 --allow-existing # avoi ask 2 rpac xist .venv eah tme
+source "$env/bin/activate"
+python --version && which python
+
+cat scripts/requirements.txt
+uv pip install -r scripts/requirements.txt
+
+jupyter lab
+
+$env:POLY_API_KEY = "Ab7w63S7k9zGhtpS7pFbO24a0HF81Vot"
+
+uv run python scripts/src/fetch_data.py --symbol AAPL --start 2025-02-05 --end 2025-02-06
+
+
+deactivate
