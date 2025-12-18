@@ -5,13 +5,12 @@ import argparse
 import logging
 import os
 import time
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, Optional
-
 import pandas as pd
 import requests
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -247,7 +246,7 @@ def main():
     Path(args.outdir).mkdir(exist_ok=True)
     df = fetch(args.symbol, args.start, args.end)
     outfile = (
-        Path(args.outdir) / "%s_%s_%s_1min.csv" % (args.symbol, args.start, args.end)
+        Path(args.outdir) / ("%s_%s_%s_1min.csv" % (args.symbol, args.start, args.end))
     )
     df.to_csv(outfile, index=False)
     print("Saved %d rows to %s" % (len(df), outfile))

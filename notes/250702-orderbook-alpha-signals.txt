@@ -186,9 +186,6 @@ jupyter nbconvert --to webpdf notebooks/02_risk_managed_backtest.ipynb --allow-c
 $env:BROWSER = '"C:\Program Files\Google\Chrome\Application\chrome.exe" %s'
 jupyter lab
 
-$env:POLY_API_KEY = "Ab7w63S7k9zGhtpS7pFbO24a0HF81Vot"
-python fetch_data.py --symbol AAPL --start 2025-02-05 --end 2025-02-06
-
 # linter
 .\fix_lint.ps1
 
@@ -199,6 +196,16 @@ deactivate
 npm install -g @anthropic-ai/claude-code
 # `-g` 4 glo nstl: in `C:\Users\mathi\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code`
 claude
+
+
+
+
+
+
+
+
+
+python -c "from dotenv import load_dotenv; import os; print('Loaded:', load_dotenv(verbose=True)); print('Key:', os.getenv('POLY_API_KEY'))"
 
 
 
@@ -227,7 +234,9 @@ uv pip install -r scripts/requirements.txt
 
 jupyter lab
 
+$env:POLY_API_KEY = "Ab7w63S7k9zGhtpS7pFbO24a0HF81Vot"
 
+uv run python scripts/src/fetch_data.py --symbol AAPL --start 2025-02-05 --end 2025-02-06
 
 
 deactivate
