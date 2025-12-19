@@ -2,10 +2,21 @@
 
 import numpy as np
 import pandas as pd
-from typing import Any, Dict, Tuple
+from dataclasses import astuple, dataclass
+from typing import Any, Dict, Tuple, Optional
 
 
-def filter_trades(sig: pd.Series, max_trades: int, threshold: int) -> pd.Series:
+@dataclass
+class BacktestResult:
+    """Container for backtest results."""
+    equity_curve: pd.Series
+    strategy_returns: pd.Series
+    position: pd.Series
+    num_trades: int
+    min_time_between_trades: Optional[pd.Timedelta]
+
+
+def filter_trades(sig: pd.Series, max_trades: int, threshold: int) -> Tuple[pd.Series, pd.Timedelta]:
     # Filter signals by threshold - only trade on strong signals
     filtered_signal = sig.copy()
     filtered_signal[abs(sig) < threshold] = 0.0
@@ -16,6 +27,10 @@ def filter_trades(sig: pd.Series, max_trades: int, threshold: int) -> pd.Series:
 
     # Track trades per day
     daily_trades = {}
+
+    # Track minimum time between position changes
+    last_change_time = None
+    min_time_between_changes = None
 
     for i, (timestamp, sig) in enumerate(filtered_signal.items()):
         if i == 0:
@@ -35,13 +50,19 @@ def filter_trades(sig: pd.Series, max_trades: int, threshold: int) -> pd.Series:
         if desired_position != current_position:
             # Check if we can make another trade today
             if daily_trades[current_date] < max_trades:
+                # Track time between changes
+                if last_change_time is not None:
+                    time_delta = timestamp - last_change_time
+                    if min_time_between_changes is None or time_delta < min_time_between_changes:
+                        min_time_between_changes = time_delta
+                
+                last_change_time = timestamp
                 current_position = desired_position
                 daily_trades[current_date] += 1
 
         position.iloc[i] = current_position
 
-    return position
-
+    return position, min_time_between_changes
 
 def backtest(
     df: pd.DataFrame,
@@ -49,7 +70,7 @@ def backtest(
     cost_bp: float = 0.0,
     max_trades_per_day: int = None,
     signal_threshold: float = None,
-) -> Tuple[pd.Series, pd.Series]:
+) -> BacktestResult:
     """
     Backtest with possibly trade frequency limits and signal filtering.
 
@@ -61,22 +82,25 @@ def backtest(
         signal_threshold: if given, only trade when |signal| > threshold (filters weak signals)
 
     Returns:
-        Tuple of (equity_curve, strategy_returns)
+        BacktestResult object containing equity_curve, strategy_returns, position, num_trades, min_time_between_trades
     """
     # Calculate returns
     returns = df["close"].pct_change().fillna(0.0)
 
     # Possibly limit the number of signal positions and apply signal with 1-period lag (realistic trading assumption):
     if max_trades_per_day and signal_threshold:
-        position = filter_trades(signal, max_trades_per_day, signal_threshold).shift(1).fillna(0.0)
+        position, min_time_between_changes = filter_trades(signal, max_trades_per_day, signal_threshold)
+        position = position.shift(1).fillna(0.0)
     else: 
         position = signal.shift(1).fillna(0.0)
-
-    # Apply 1-period lag (realistic trading assumption)
-    position = position
+        min_time_between_changes = None
 
     # Strategy returns before costs
     strategy_returns = returns * position
+
+    # Calculate number of trades (position changes)
+    position_changes = position.diff().abs()
+    num_trades = (position_changes > 0).sum()
 
     # Apply trading costs
     if cost_bp > 0:
@@ -88,25 +112,31 @@ def backtest(
     # Calculate equity curve
     equity_curve = (1 + strategy_returns).cumprod()
 
-    return equity_curve, strategy_returns
+    return BacktestResult(
+        equity_curve=equity_curve,
+        strategy_returns=strategy_returns,
+        position=position,
+        num_trades=num_trades,
+        min_time_between_trades=min_time_between_changes
+    )
 
 
 def calculate_metrics(
-    equity_curve: pd.Series,
-    strategy_returns: pd.Series,
+    results : BacktestResult,
     benchmark_returns: pd.Series = None,
 ) -> Dict[str, Any]:
     """
     Calculate comprehensive trading performance metrics.
 
     Args:
-        equity_curve: Cumulative equity curve
-        strategy_returns: Strategy returns series
+        results: Results from backtesting
         benchmark_returns: Optional benchmark returns for comparison
 
     Returns:
         Dictionary of performance metrics
     """
+    equity_curve, strategy_returns, _, num_trades, _ = astuple(results)
+
     # Basic returns metrics
     total_return = equity_curve.iloc[-1] - 1.0
     n_periods = len(strategy_returns)
@@ -152,7 +182,7 @@ def calculate_metrics(
         "calmar_ratio": calmar_ratio,
         "win_rate": win_rate,
         "profit_factor": profit_factor,
-        "total_trades": len(strategy_returns[strategy_returns != 0]),
+        "total_trades": num_trades,
         "avg_return_per_trade": (
             strategy_returns[strategy_returns != 0].mean()
             if len(strategy_returns[strategy_returns != 0]) > 0

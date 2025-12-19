@@ -1,10 +1,9 @@
 """Risk management utilities for trading strategies."""
 
 import logging
-from typing import Any, Dict, Optional, Tuple
-
 import numpy as np
 import pandas as pd
+from typing import Any, Dict, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
